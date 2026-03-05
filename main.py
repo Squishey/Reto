@@ -1,0 +1,32 @@
+import pygame
+import numpy as np
+
+
+# CONFIG GENERAL
+
+ANCHO_PANTALLA = 800
+ALTO_PANTALLA = 500
+FPS = 30
+
+# COLOR
+
+BLANCO = (245, 245, 245)
+GRIS = (170, 170, 170)
+AZUL = (40, 120, 255)
+VERDE = (0, 200, 0)
+AMARILLO = (240, 200, 0)
+ROJO = (220, 0, 0)
+
+# CICLO DEL SEMAFORO
+
+CICLO_SEMAFORO = 90
+TICKS_VERDE = 30
+TICKS_AMARILLO = 30
+TICKS_ROJO = 30
+
+# PARAMETROS DE MOVIMIENTO
+
+aceleracion = 0.5
+frenado = 1
+distancia_colision = 90
+distancia_semaforo = 100
