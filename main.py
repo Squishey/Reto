@@ -30,3 +30,42 @@ aceleracion = 0.5
 frenado = 1
 distancia_colision = 90
 distancia_semaforo = 100
+
+
+# ==============================
+# FUNCIONES DEL SEMÁFORO
+# ==============================
+
+def obtener_estado_semaforo(contador):
+    contador = contador % CICLO_SEMAFORO
+    if contador < TICKS_VERDE:
+        return "verde"
+    elif contador < TICKS_VERDE + TICKS_AMARILLO:
+        return "amarillo"
+    else:
+        return "rojo"
+
+
+def obtener_color_semaforo(estado):
+    if estado == "verde":
+        return VERDE
+    elif estado == "amarillo":
+        return AMARILLO
+    else:
+        return ROJO
+
+
+# ==============================
+# FUNCIONES MATEMÁTICAS
+# ==============================
+
+def distancia(punto1, punto2):
+    diferencia = punto1 - punto2
+    return np.sqrt(diferencia[0]**2 + diferencia[1]**2)
+
+
+def dibujar_carro(pantalla, posicion, ancho=40, alto=20, color=AZUL):
+    esquina_x = posicion[0] - ancho/2
+    esquina_y = posicion[1] - alto/2
+    rectangulo = pygame.Rect(esquina_x, esquina_y, ancho, alto)
+    pygame.draw.rect(pantalla, color, rectangulo)
