@@ -69,3 +69,29 @@ def dibujar_carro(pantalla, posicion, ancho=40, alto=20, color=AZUL):
     esquina_y = posicion[1] - alto/2
     rectangulo = pygame.Rect(esquina_x, esquina_y, ancho, alto)
     pygame.draw.rect(pantalla, color, rectangulo)
+    # ==============================
+# DATOS DE LOS CARROS
+# ==============================
+
+numero_carros = 2
+
+posiciones = np.array([
+    [0.0, ALTO_PANTALLA / 2],
+    [150.0, ALTO_PANTALLA / 2]
+], dtype=float)
+
+velocidades = np.array([0.0, 3.0], dtype=float)
+velocidades_maximas = np.array([6.0, 7.0], dtype=float)
+
+# ==============================
+# SEMÁFORO
+# ==============================
+
+posicion_semaforo = np.array(
+    [ANCHO_PANTALLA / 2, ALTO_PANTALLA / 2],
+    dtype=float
+)
+
+contador_semaforo = 0
+estado_semaforo = "verde"
+
