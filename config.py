@@ -1,0 +1,20 @@
+# Config general 
+
+#pantalla
+ANCHO_PANTALLA = 800
+ALTO_PANTALLA = 500
+FPS = 30
+
+#colores
+BLANCO = (245, 245, 245)
+GRIS = (170, 170, 170)
+AZUL = (40, 120, 255)
+VERDE = (0, 200, 0)
+AMARILLO = (240, 200, 0)
+ROJO = (220,0, 0)
+
+#params de movimiento
+ACELERACION = 0.5
+FRENADO = 1
+DISTANCIA_COLISION = 90
+DISTANCIA_SEMAFORO = 100
