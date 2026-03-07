@@ -58,11 +58,24 @@ def distancia(punto1, punto2):
     return np.sqrt(diferencia[0]**2 + diferencia[1]**2)
 
 
-def dibujar_carro(pantalla, posicion, ancho=40, alto=20, color=AZUL):
-    esquina_x = posicion[0] - ancho/2
-    esquina_y = posicion[1] - alto/2
-    rectangulo = pygame.Rect(esquina_x, esquina_y, ancho, alto)
-    pygame.draw.rect(pantalla, color, rectangulo)
+def dibujar_carro(pantalla, posicion, ancho=40, alto=20, color=AZUL, angulo=0):
+    vertices = np.array([
+        [-ancho/2, -alto/2],
+        [ ancho/2, -alto/2],
+        [ ancho/2,  alto/2],
+        [-ancho/2,  alto/2]
+    ])
+
+    rad = np.radians(angulo)
+    R = np.array([
+        [np.cos(rad), -np.sin(rad)],
+        [np.sin(rad),  np.cos(rad)]
+    ])
+
+    rotado = vertices @ R.T
+    trasladado = rotado + posicion
+
+    pygame.draw.polygon(pantalla, color, trasladado)
 
     #carros data
 
