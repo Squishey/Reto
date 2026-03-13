@@ -1,6 +1,6 @@
 import pygame
 import numpy as np
-from config import (ANCHO_PANTALLA, ALTO_PANTALLA, FPS, BLANCO, GRIS, AZUL, ROJO)
+from config import (ANCHO_PANTALLA, ALTO_PANTALLA, FPS, BLANCO, GRIS, AZUL, ROJO, VERDE, AMARILLO)
 from semaforo import Semaforo
 from carro import Carro, bezier
 
@@ -13,23 +13,36 @@ class Simulacion:
         self.pantalla = pygame.display.set_mode((ANCHO_PANTALLA, ALTO_PANTALLA))
         self.reloj = pygame.time.Clock()
 
-        self.semaforo = Semaforo([ANCHO_PANTALLA / 2, ALTO_PANTALLA / 2])
-
-        # La curva comienza justo donde está el semáforo
         semx = ANCHO_PANTALLA / 2
-        semy = ALTO_PANTALLA / 2
-        self.P0 = np.array([semx,                          semy])
-        self.P1 = np.array([semx + (ANCHO_PANTALLA - semx) * 0.5, semy - 120])
-        self.P2 = np.array([ANCHO_PANTALLA + 40.0,         semy - 150])
+        # 2 semaforos con desfase para que alternen. Semforo 2 mas cerca del cruce 
+        self.semaforo_1 = Semaforo([semx, ALTO_PANTALLA / 2 + 50])
+        self.semaforo_2 = Semaforo([semx + 120, ALTO_PANTALLA / 2 - 100], offset=60)
+
+        #curva 1: de abajo hacia arriba (cruzaa  la otra)
+        self.P0_1 = np.array([semx, ALTO_PANTALLA / 2 + 50])
+        self.P1_1 = np.array([semx + 150, ALTO_PANTALLA / 2 + 50])
+        self.P2_1 = np.array([ANCHO_PANTALLA + 40.0, ALTO_PANTALLA / 2 - 150])
+
+        # crva 2: de arriba hacia abajo (cruza la otra). Empieza despues
+        self.P0_2 = np.array([semx + 120, ALTO_PANTALLA / 2 - 100])
+        self.P1_2 = np.array([semx + 120 + 150, ALTO_PANTALLA / 2 - 100])
+        self.P2_2 = np.array([ANCHO_PANTALLA + 40.0, ALTO_PANTALLA / 2 + 100])
 
         self.carros = [
-            Carro(0.0, ALTO_PANTALLA / 2, velocidad_inicial=0.0, velocidad_maxima=6.0),
-            Carro(150.0, ALTO_PANTALLA / 2, velocidad_inicial=3.0, velocidad_maxima=7.0, color=ROJO),
+            Carro(0.0, self.P0_1[1], velocidad_inicial=0.0, velocidad_maxima=6.0),
+            Carro(150.0, self.P0_1[1], velocidad_inicial=3.0, velocidad_maxima=7.0, color=ROJO),
+            Carro(50.0, self.P0_2[1], velocidad_inicial=2.0, velocidad_maxima=5.0, color=VERDE),
+            Carro(200.0, self.P0_2[1], velocidad_inicial=4.0, velocidad_maxima=6.0, color=AMARILLO),
         ]
 
-        # Ambos carros tienen la curva configurada; se activa automáticamente al pasar el semáforo
-        for carro in self.carros:
-            carro.curva_pts = (self.P0, self.P1, self.P2)
+        # asignar curvas y semaforos correspondientes!
+        for idx, carro in enumerate(self.carros):
+            if idx < 2:
+                carro.curva_pts = (self.P0_1, self.P1_1, self.P2_1)
+                carro.mi_semaforo = self.semaforo_1
+            else:
+                carro.curva_pts = (self.P0_2, self.P1_2, self.P2_2)
+                carro.mi_semaforo = self.semaforo_2
 
     def ejecutar(self):
         running = True;
@@ -47,26 +60,47 @@ class Simulacion:
         return True;
 
     def _actualizar(self):
-        self.semaforo.actualizar()
+        self.semaforo_1.actualizar()
+        self.semaforo_2.actualizar()
         for carro in self.carros:
-            carro.actualizar(self.semaforo, self.carros)
+            carro.actualizar(carro.mi_semaforo, self.carros)
 
     def _dibujar(self):
-        self.pantalla.fill(BLANCO)
+        # Fondo verde para simular tipo cesped o algo asi jajaj
+        self.pantalla.fill((200, 230, 200))
 
-        # Carretera recta hasta el semáforo
-        semx = int(self.semaforo.posicion[0])
-        y = ALTO_PANTALLA // 2
-        pygame.draw.line(self.pantalla, GRIS, (0, y), (semx, y), 4)
+        # Decoración simple: Árboles
+        for arbol_x, arbol_y in [(100, 100), (300, 80), (700, 400), (600, 80), (200, 400), (450, 400), (750, 200)]:
+            pygame.draw.circle(self.pantalla, (139, 69, 19), (arbol_x, arbol_y), 5) # Tronco
+            pygame.draw.circle(self.pantalla, (34, 139, 34), (arbol_x, arbol_y - 12), 20) # Hojas
 
-        # Tramo curvo como continuación de la misma calle, después del semáforo
-        puntos_curva = [bezier(i / 50, self.P0, self.P1, self.P2) for i in range(51)]
-        pygame.draw.lines(self.pantalla, GRIS, False, puntos_curva, 4)
+        #semaforo 1
+        semx1 = int(self.semaforo_1.posicion[0])
+        y1 = int(self.semaforo_1.posicion[1])
+        pygame.draw.line(self.pantalla, GRIS, (0, y1), (semx1, y1), 40) # Calle más gruesa
+        pygame.draw.line(self.pantalla, BLANCO, (0, y1), (semx1, y1), 2) # Línea divisoria
 
-        # Semaforo
-        self.semaforo.dibujar(self.pantalla)
+        puntos_curva_1 = [bezier(i / 100, self.P0_1, self.P1_1, self.P2_1) for i in range(101)]
+        pygame.draw.lines(self.pantalla, GRIS, False, puntos_curva_1, 40)
+        pygame.draw.lines(self.pantalla, BLANCO, False, puntos_curva_1, 2)
+        self.semaforo_1.dibujar(self.pantalla)
 
-        # Carros (el ángulo lo calcula cada carro internamente si sigue una curva)
+        # Semaforo 2
+        semx2 = int(self.semaforo_2.posicion[0])
+        y2 = int(self.semaforo_2.posicion[1])
+        pygame.draw.line(self.pantalla, GRIS, (0, y2), (semx2, y2), 40) # Calle gruesa
+        pygame.draw.line(self.pantalla, BLANCO, (0, y2), (semx2, y2), 2) # Línea divisoria
+
+        puntos_curva_2 = [bezier(i / 100, self.P0_2, self.P1_2, self.P2_2) for i in range(101)]
+        pygame.draw.lines(self.pantalla, GRIS, False, puntos_curva_2, 40)
+        pygame.draw.lines(self.pantalla, BLANCO, False, puntos_curva_2, 2)
+        self.semaforo_2.dibujar(self.pantalla)
+
+        #semaforos por encima de las calles
+        self.semaforo_1.dibujar(self.pantalla)
+        self.semaforo_2.dibujar(self.pantalla)
+
+        # Carros (el angulo lo calcula cada carro internamente si sigue una curva)
         for carro in self.carros:
             carro.dibujar(self.pantalla)
 
