@@ -9,9 +9,9 @@ class Semaforo:
     TICKS_AMARILLO = 30
     TICKS_ROJO = 60
 
-    def __init__(self, posicion):
-        self.posicion = np.array(posicion, dtype=float);
-        self.contador = 0
+    def __init__(self, posicion, offset=0):
+        self.posicion = np.array(posicion, dtype=float)
+        self.contador = offset
         self.estado = "verde"
 
     def actualizar(self):
