@@ -9,7 +9,7 @@ from carro import Carro, bezier
 class Simulacion:
     def __init__(self):
         pygame.init()
-        pygame.display.set_caption("Etapa 1 - Simulación de Tráfico")
+        pygame.display.set_caption("Simulacion de trafico")
         self.pantalla = pygame.display.set_mode((ANCHO_PANTALLA, ALTO_PANTALLA))
         self.reloj = pygame.time.Clock()
 
